@@ -6,10 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
 
 /**
- * Simple driver-controlled OpMode for a mecanum robot with a claw.
+ * Simple driver-controlled OpMode for a mecanum robot.
  */
 @TeleOp(name = "My TeleOp", group = "Driver Control")
 public class MyTeleOp extends LinearOpMode {
@@ -17,7 +16,6 @@ public class MyTeleOp extends LinearOpMode {
     private DcMotor rightFront;
     private DcMotor leftRear;
     private DcMotor rightRear;
-    private Servo claw;
     private IMU imu;
 
     @Override
@@ -27,7 +25,6 @@ public class MyTeleOp extends LinearOpMode {
         rightFront = hardwareMap.get(DcMotor.class, "rf");
         leftRear = hardwareMap.get(DcMotor.class, "lr");
         rightRear = hardwareMap.get(DcMotor.class, "rr");
-        claw = hardwareMap.get(Servo.class, "claw");
         imu = hardwareMap.get(IMU.class, "imu");
 
         imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -72,12 +69,6 @@ public class MyTeleOp extends LinearOpMode {
             leftRear.setPower(backLeftPower);
             rightFront.setPower(frontRightPower);
             rightRear.setPower(backRightPower);
-
-            if (gamepad1.a) {
-                claw.setPosition(1.0); // Close claw
-            } else if (gamepad1.b) {
-                claw.setPosition(0.0); // Open claw
-            }
 
             telemetry.addData("Drive", "y: %.2f, x: %.2f, turn: %.2f", y, x, rx);
             telemetry.addData("Powers", "lf: %.2f rf: %.2f lr: %.2f rr: %.2f",
