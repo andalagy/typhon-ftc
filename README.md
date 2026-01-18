@@ -2,7 +2,7 @@
 
 Fully functioning base code, tested, ready to plug in on the finished bot.  (minus the detection part)
 <br>Dedicated for https://ftc-events.firstinspires.org/team/33790
-<br>Contributors: andalagy, (yes i have no friends)
+<br>Contributors: andalagy
 <br>I also wrote comments for all of you non code ppl out there
 <br>
 <br>
@@ -16,7 +16,7 @@ Fully functioning base code, tested, ready to plug in on the finished bot.  (min
 3. Select the `FtcRobotController` module as the run configuration.
 4. Plug in the Robot Controller phone via USB.
 5. Click Run ▶ to install the app.
-6. Connect the Driver Station phone and select `DecodeTeleOp` (or other OpModes) to test on the real robot.
+6. Connect the Driver Station phone and select `MyTeleOp` (or other OpModes) to test on the real robot.
 <br>
 <br>
 <br>
