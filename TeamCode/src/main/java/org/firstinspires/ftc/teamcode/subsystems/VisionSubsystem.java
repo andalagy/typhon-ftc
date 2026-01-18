@@ -44,6 +44,48 @@ public class VisionSubsystem {
         MOTIF_C
     }
 
+    public enum AprilTagMeaning {
+        BLUE_GOAL(20, "Blue Goal"),
+        PATTERN_GPP(21, "G P P"),
+        PATTERN_PGP(22, "P G P"),
+        PATTERN_PPG(23, "P P G"),
+        RED_GOAL(24, "Red Goal"),
+        UNKNOWN(-1, "Unknown");
+
+        private final int tagId;
+        private final String description;
+
+        AprilTagMeaning(int tagId, String description) {
+            this.tagId = tagId;
+            this.description = description;
+        }
+
+        public int getTagId() {
+            return tagId;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public static AprilTagMeaning fromId(int tagId) {
+            switch (tagId) {
+                case 20:
+                    return BLUE_GOAL;
+                case 21:
+                    return PATTERN_GPP;
+                case 22:
+                    return PATTERN_PGP;
+                case 23:
+                    return PATTERN_PPG;
+                case 24:
+                    return RED_GOAL;
+                default:
+                    return UNKNOWN;
+            }
+        }
+    }
+
     private final OpenCvWebcam webcam;
     private final SleevePipeline pipeline;
     private final AprilTagPipeline aprilTagPipeline;
@@ -138,6 +180,11 @@ public class VisionSubsystem {
     /** latest AprilTag target pose (if any) */
     public BackdropTarget getBackdropTarget(DetectedMotif desired) {
         return aprilTagPipeline.getBestTargetFor(desired);
+    }
+
+    /** latest AprilTag meaning (pattern/goal) based on detected ID */
+    public AprilTagMeaning getLatestAprilTagMeaning() {
+        return aprilTagPipeline.getLatestTagMeaning();
     }
 
     /** switch from the sleeve pipeline to the AprilTag pipeline for backdrop alignment */
@@ -351,7 +398,8 @@ public class VisionSubsystem {
     private static class AprilTagPipeline extends OpenCvPipeline {
         private final long nativeApriltagPtr;
         private final Mat gray = new Mat();
-        private volatile AprilTagDetection latestDetection;
+        private volatile AprilTagDetection latestBackdropDetection;
+        private volatile AprilTagDetection latestAnyDetection;
 
         AprilTagPipeline() {
             nativeApriltagPtr = AprilTagDetectorJNI.createApriltagDetector(
@@ -375,14 +423,15 @@ public class VisionSubsystem {
 
             cropped.release();
 
-            latestDetection = chooseBackdropDetection(detections);
+            latestBackdropDetection = chooseBackdropDetection(detections);
+            latestAnyDetection = chooseClosestDetection(detections);
 
             // Draw ROI for dashboard/preview feedback
             Imgproc.rectangle(input, roi, new Scalar(255, 128, 0), 2);
-            if (latestDetection != null) {
-                Point center = new Point(latestDetection.center.x + roi.x, latestDetection.center.y + roi.y);
+            if (latestAnyDetection != null) {
+                Point center = new Point(latestAnyDetection.center.x + roi.x, latestAnyDetection.center.y + roi.y);
                 Imgproc.circle(input, center, 6, new Scalar(0, 255, 255), -1);
-                Imgproc.putText(input, String.format("id:%d", latestDetection.id),
+                Imgproc.putText(input, String.format("id:%d", latestAnyDetection.id),
                         new Point(center.x - 20, center.y - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5,
                         new Scalar(0, 255, 255), 2);
             }
@@ -411,8 +460,18 @@ public class VisionSubsystem {
             return best;
         }
 
+        private AprilTagDetection chooseClosestDetection(ArrayList<AprilTagDetection> detections) {
+            AprilTagDetection best = null;
+            for (AprilTagDetection detection : detections) {
+                if (best == null || detection.pose.z < best.pose.z) {
+                    best = detection;
+                }
+            }
+            return best;
+        }
+
         public BackdropTarget getBestTargetFor(DetectedMotif desired) {
-            AprilTagDetection detection = latestDetection;
+            AprilTagDetection detection = latestBackdropDetection;
             if (detection == null) {
                 return null;
             }
@@ -428,6 +487,14 @@ public class VisionSubsystem {
             double headingError = detection.pose.yaw;
             double pixelOffset = detection.center.x - CX;
             return new BackdropTarget(detection.id, range, lateral, headingError, pixelOffset);
+        }
+
+        public AprilTagMeaning getLatestTagMeaning() {
+            AprilTagDetection detection = latestAnyDetection;
+            if (detection == null) {
+                return AprilTagMeaning.UNKNOWN;
+            }
+            return AprilTagMeaning.fromId(detection.id);
         }
 
         public void updateDecimation() {
