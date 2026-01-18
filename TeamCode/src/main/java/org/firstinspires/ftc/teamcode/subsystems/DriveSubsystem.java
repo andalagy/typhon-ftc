@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.RobotConstants;
 import org.firstinspires.ftc.teamcode.drive.OdometryPoseEstimator;
 import org.firstinspires.ftc.teamcode.geometry.AngleUtil;
@@ -138,7 +139,7 @@ public class DriveSubsystem {
 
     /** raw yaw from the IMU, in radians. */
     private double getRawHeadingRadians() {
-        return imu.getRobotYawPitchRollAngles().getYaw(RevHubOrientationOnRobot.AngleUnit.RADIANS);
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
     }
 
     public void enableHeadingHold(boolean enabled) {
