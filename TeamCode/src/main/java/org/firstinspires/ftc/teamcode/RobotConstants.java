@@ -14,6 +14,11 @@ public class RobotConstants {
     public static final String INTAKE_NAME = "intakeMotor";
     public static final String IMU_NAME = "imu";
     public static final String WEBCAM_NAME = "Webcam 1";
+    public static final String TURRET_SERVO_NAME = "turretServo";
+    public static final String LED_GREEN_NAME = "ledGreen";
+    public static final String LED_RED_NAME = "ledRed";
+    public static final String SHOOTER_MOTOR_NAME = "shooterMotor";
+    public static final String FEEDER_SERVO_NAME = "feederServo";
 
     // drive speed scales
     public static final double NORMAL_SPEED = 0.9;   // full power scale for teleop ☆
