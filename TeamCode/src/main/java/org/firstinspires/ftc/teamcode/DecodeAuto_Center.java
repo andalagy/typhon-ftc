@@ -4,10 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.GateSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.SlideSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.SlideSubsystem.SlidePreset;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.DetectedMotif;
 import org.firstinspires.ftc.teamcode.geometry.Pose2d;
@@ -17,25 +13,18 @@ import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.BackdropTarget;
 
 /**
  * Center-side auto with the same subsystems as TeleOp.
- * Drives forward to score the preload, branches parking based on the detected motif.
+ * Drives forward to align with the backdrop, branches parking based on the detected motif.
  */
 @Autonomous(name = "Decode Auto Center", group = "Main")
 public class DecodeAuto_Center extends LinearOpMode {
     private DriveSubsystem drive;
-    private IntakeSubsystem intake;
-    private SlideSubsystem slides;
-    private GateSubsystem gate;
     private VisionSubsystem vision;
 
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new DriveSubsystem(hardwareMap);
-        intake = new IntakeSubsystem(hardwareMap);
-        slides = new SlideSubsystem(hardwareMap);
-        gate = new GateSubsystem(hardwareMap);
         vision = new VisionSubsystem(hardwareMap, telemetry);
 
-        gate.close();
         vision.start();
 
         DetectedMotif detectedMotif = DetectedMotif.MOTIF_B;
@@ -72,30 +61,7 @@ public class DecodeAuto_Center extends LinearOpMode {
             drive.strafeWithHeading(strafe, 0.35, 0, this);
         }
 
-        // 2. raise slides and score
-        slides.goToPreset(SlidePreset.HIGH);
-        while (opModeIsActive() && !slides.isAtTarget() && !slides.isFaulted()) {
-            telemetry.addData("Step", "Raising slides");
-            telemetry.addData("Slide pos", slides.getAveragePosition());
-            if (target == null) {
-                target = vision.getBackdropTarget(detectedMotif);
-            }
-            telemetry.addData("Tag seen?", target != null);
-            telemetry.update();
-            idle();
-        }
-        if (slides.isFaulted()) {
-            telemetry.addData("Slide fault", slides.getFaultReason());
-            telemetry.update();
-            return;
-        }
-
-        gate.open();
-        sleep(600);
-        gate.close();
-
-        // 3. retract and park according to the motif
-        slides.goToPreset(SlidePreset.INTAKE);
+        // 2. park according to the motif
         Trajectory clearBackdrop = new TrajectoryBuilder(drive.getPoseEstimate())
                 .lineTo(new Pose2d(0, 20, drive.getPoseEstimate().heading), 0.55)
                 .build();
