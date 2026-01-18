@@ -6,7 +6,7 @@ Fully functioning base code, tested, ready to plug in on the finished bot.  (min
 <br>I also wrote comments for all of you non code ppl out there
 <br>
 <br>
-<br>DO NOT CHANGE ANYTHING OUTSIDE OF THE TEAMCODE FOLDER
+<br>DO NOT CHANGE ANYTHING OUTSIDE OF THE **TeamCode** FOLDER
 <br>
 <br>
 ## How to build & run
