@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.teamcode.RobotConstants;
+
 /**
  * Simple driver-controlled OpMode for a mecanum robot.
  */
@@ -21,11 +23,11 @@ public class MyTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // Hardware initialization
-        leftFront = hardwareMap.get(DcMotor.class, "lf");
-        rightFront = hardwareMap.get(DcMotor.class, "rf");
-        leftRear = hardwareMap.get(DcMotor.class, "lr");
-        rightRear = hardwareMap.get(DcMotor.class, "rr");
-        imu = hardwareMap.get(IMU.class, "imu");
+        leftFront = hardwareMap.get(DcMotor.class, RobotConstants.FRONT_LEFT_NAME);
+        rightFront = hardwareMap.get(DcMotor.class, RobotConstants.FRONT_RIGHT_NAME);
+        leftRear = hardwareMap.get(DcMotor.class, RobotConstants.BACK_LEFT_NAME);
+        rightRear = hardwareMap.get(DcMotor.class, RobotConstants.BACK_RIGHT_NAME);
+        imu = hardwareMap.get(IMU.class, RobotConstants.IMU_NAME);
 
         imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
