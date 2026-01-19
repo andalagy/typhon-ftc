@@ -73,6 +73,9 @@ public class RobotConstants {
     public static final double TRAJECTORY_HEADING_TOLERANCE_RAD =
             Math.toRadians(2.0);
 
+    // Safety timeout for any trajectory-following segment (seconds)
+    public static final double TRAJECTORY_MAX_TIME_SEC = 6.0;
+
     // Heading hold assist PID (if used)
     public static final double HEADING_HOLD_KP        = 0.02;
     public static final double HEADING_HOLD_DEADBAND  = 0.05; // ignore tiny stick wiggles

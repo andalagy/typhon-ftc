@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.TurretAimingSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.DetectedMotif;
 
@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.DetectedMotif;
 public class DecodeTeleOp extends LinearOpMode {
     private DriveSubsystem drive;
     private IntakeSubsystem intake;
-    private TurretAimingSubsystem turret;
+    private TurretSubsystem turret;
     private VisionSubsystem vision;
 
     private boolean headingHoldToggleLatch = false;
@@ -30,7 +30,7 @@ public class DecodeTeleOp extends LinearOpMode {
         drive = new DriveSubsystem(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
         vision = new VisionSubsystem(hardwareMap, telemetry);
-        turret = new TurretAimingSubsystem(hardwareMap, telemetry);
+        turret = new TurretSubsystem(hardwareMap, telemetry);
 
         vision.start();
         vision.useAprilTags();
