@@ -76,6 +76,7 @@ public class MyTeleOp extends LinearOpMode {
             telemetry.addData("Powers", "lf: %.2f rf: %.2f lr: %.2f rr: %.2f",
                     frontLeftPower, frontRightPower, backLeftPower, backRightPower);
             telemetry.update();
+            idle();
         }
     }
 }

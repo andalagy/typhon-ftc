@@ -81,6 +81,11 @@ public class RobotConstants {
     public static final double HEADING_HOLD_DEADBAND  = 0.05; // ignore tiny stick wiggles
     public static final double HEADING_HOLD_MAX_TURN   = 0.4;  // max correction power
 
+    // Safety timeouts for blocking drive helpers (seconds)
+    public static final double DRIVE_STRAIGHT_TIMEOUT_SEC = 4.0;
+    public static final double STRAFE_TIMEOUT_SEC = 4.0;
+    public static final double TURN_TIMEOUT_SEC = 3.0;
+
     // ----------------------------------------------------------------
     // Vision / Detection Labels
     // Use these as type-safe labels for detected objects or motifs
