@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.TurretAimingSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.DetectedMotif;
 
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.DetectedMotif;
 public class DecodeTeleOp extends LinearOpMode {
     private DriveSubsystem drive;
     private IntakeSubsystem intake;
+    private TurretAimingSubsystem turret;
     private VisionSubsystem vision;
 
     private boolean headingHoldToggleLatch = false;
@@ -28,8 +30,10 @@ public class DecodeTeleOp extends LinearOpMode {
         drive = new DriveSubsystem(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
         vision = new VisionSubsystem(hardwareMap, telemetry);
+        turret = new TurretAimingSubsystem(hardwareMap, telemetry);
 
         vision.start();
+        vision.useAprilTags();
         telemetry.addLine("TeleOp ready — press play when the field says go");
         telemetry.update();
 
@@ -71,6 +75,13 @@ public class DecodeTeleOp extends LinearOpMode {
 
             // Vision heartbeat: report live motif
             DetectedMotif detectedMotif = vision.getCurrentMotif();
+            VisionSubsystem.BackdropTarget target = vision.getBackdropTarget(detectedMotif);
+            if (target != null) {
+                turret.setVisionAim(target.headingErrorRad, target.xPixelError, true);
+            } else {
+                turret.setVisionAim(0.0, 0.0, false);
+            }
+            turret.update();
             vision.applyCameraControls();
 
             telemetry.addData("Heading (deg)", "%.1f", drive.getHeadingDegrees());
@@ -82,6 +93,9 @@ public class DecodeTeleOp extends LinearOpMode {
             telemetry.addData("Intake power", "%.2f", intake.getPower());
             telemetry.addData("Vision motif", detectedMotif);
             telemetry.addData("Vision camera", vision.getCameraStatus());
+            telemetry.addData("Tag visible", target != null);
+            telemetry.addData("Turret aligned", turret.isAligned());
+            telemetry.addData("Turret aim error", "%.3f", turret.getAimError());
             telemetry.update();
         }
 

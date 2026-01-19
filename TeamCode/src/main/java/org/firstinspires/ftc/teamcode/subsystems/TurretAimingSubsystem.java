@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.RobotConstants;
  * vision.start();
  * vision.useAprilTags();
  *
- * TurretAimingSubsystem turret = new TurretAimingSubsystem(hardwareMap, vision, telemetry);
+ * TurretAimingSubsystem turret = new TurretAimingSubsystem(hardwareMap, telemetry);
  *
  * while (opModeIsActive()) {
  *     if (gamepad1.left_bumper) {
@@ -35,6 +35,12 @@ import org.firstinspires.ftc.teamcode.RobotConstants;
  *         turret.requestFire();
  *     }
  *
+ *     VisionSubsystem.BackdropTarget target = vision.getBackdropTarget(vision.getCurrentMotif());
+ *     if (target != null) {
+ *         turret.setVisionAim(target.headingErrorRad, target.xPixelError, true);
+ *     } else {
+ *         turret.setVisionAim(0.0, 0.0, false);
+ *     }
  *     turret.update();
  *     telemetry.addData("Turret Ready", turret.isReady());
  *     telemetry.addData("Aim Error", turret.getAimError());
@@ -48,8 +54,11 @@ public class TurretAimingSubsystem {
     public static double TURRET_MAX = 0.92;
     public static double TURRET_CENTER = 0.50;
 
-    public static double kAim = 0.0015;
+    public static double kHeadingAim = 0.07; // servo units per radian
+    public static double kPixelAim = 0.0015; // servo units per pixel
+    public static double HEADING_DEADBAND_RAD = Math.toRadians(1.0);
     public static double PIXEL_DEADBAND = 4.0;
+    public static double HEADING_READY_TOLERANCE_RAD = Math.toRadians(2.0);
     public static double PIXEL_READY_TOLERANCE = 6.0;
 
     public static double TARGET_RPM = 3000.0;
@@ -68,12 +77,9 @@ public class TurretAimingSubsystem {
     private final DigitalChannel ledRed;
     private final DcMotorEx shooterMotor;
     private final Servo feederServo;
-    private final VisionSubsystem vision;
     private final Telemetry telemetry;
     private final ElapsedTime fireTimer = new ElapsedTime();
 
-    private VisionSubsystem.DetectedMotif desiredMotif = VisionSubsystem.DetectedMotif.MOTIF_A;
-    private boolean useSeenTarget = true;
     private double turretPos = TURRET_CENTER;
     private double aimError = 0.0;
     private boolean aligned = false;
@@ -86,8 +92,11 @@ public class TurretAimingSubsystem {
     private double lastKD = Double.NaN;
     private double lastKF = Double.NaN;
 
-    public TurretAimingSubsystem(HardwareMap hardwareMap, VisionSubsystem vision, Telemetry telemetry) {
-        this.vision = vision;
+    private boolean hasVisionTarget = false;
+    private double headingErrorRad = 0.0;
+    private double xPixelError = 0.0;
+
+    public TurretAimingSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         turretServo = getHardware(hardwareMap, Servo.class, RobotConstants.TURRET_SERVO_NAME);
         ledGreen = getHardware(hardwareMap, DigitalChannel.class, RobotConstants.LED_GREEN_NAME);
@@ -108,25 +117,37 @@ public class TurretAimingSubsystem {
         applyVelocityPidf();
     }
 
+    public void setVisionAim(double headingErrorRad, double xPixelError, boolean hasTarget) {
+        this.headingErrorRad = headingErrorRad;
+        this.xPixelError = xPixelError;
+        this.hasVisionTarget = hasTarget;
+    }
+
     public void update() {
         applyVelocityPidf();
 
-        VisionSubsystem.DetectedMotif motif = useSeenTarget ? vision.getCurrentMotif() : desiredMotif;
-        VisionSubsystem.BackdropTarget target = vision.getBackdropTarget(motif);
-        if (target == null) {
+        if (!hasVisionTarget) {
             aimError = 0.0;
             aligned = false;
         } else {
-            aimError = target.xPixelError;
-            if (Math.abs(aimError) > PIXEL_DEADBAND) {
-                turretPos += aimError * kAim;
-                turretPos = Range.clip(turretPos, TURRET_MIN, TURRET_MAX);
-                turretServo.setPosition(turretPos);
+            boolean headingValid = Double.isFinite(headingErrorRad);
+            if (headingValid && Math.abs(headingErrorRad) > HEADING_DEADBAND_RAD) {
+                aimError = headingErrorRad;
+                turretPos += headingErrorRad * kHeadingAim;
+            } else if (Math.abs(xPixelError) > PIXEL_DEADBAND) {
+                aimError = xPixelError;
+                turretPos += xPixelError * kPixelAim;
+            } else {
+                aimError = 0.0;
             }
-            aligned = Math.abs(aimError) < PIXEL_READY_TOLERANCE;
+            turretPos = Range.clip(turretPos, TURRET_MIN, TURRET_MAX);
+            turretServo.setPosition(turretPos);
+            aligned = headingValid
+                    ? Math.abs(headingErrorRad) < HEADING_READY_TOLERANCE_RAD
+                    : Math.abs(xPixelError) < PIXEL_READY_TOLERANCE;
         }
 
-        ready = target != null && aligned && atSpeed();
+        ready = hasVisionTarget && aligned && atSpeed();
         setLed(ready, !ready);
 
         if (pendingFire && !firing && ready) {
@@ -178,17 +199,6 @@ public class TurretAimingSubsystem {
     public void setTurretCenter() {
         turretPos = Range.clip(TURRET_CENTER, TURRET_MIN, TURRET_MAX);
         turretServo.setPosition(turretPos);
-    }
-
-    public void setDesiredMotif(VisionSubsystem.DetectedMotif motif) {
-        if (motif != null) {
-            desiredMotif = motif;
-            useSeenTarget = false;
-        }
-    }
-
-    public void useSeenTarget() {
-        useSeenTarget = true;
     }
 
     public boolean isAligned() {
