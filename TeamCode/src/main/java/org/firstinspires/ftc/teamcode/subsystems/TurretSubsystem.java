@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.RobotConstants;
  * vision.start();
  * vision.useAprilTags();
  *
- * TurretAimingSubsystem turret = new TurretAimingSubsystem(hardwareMap, telemetry);
+ * TurretSubsystem turret = new TurretSubsystem(hardwareMap, telemetry);
  *
  * while (opModeIsActive()) {
  *     if (gamepad1.left_bumper) {
@@ -49,7 +49,7 @@ import org.firstinspires.ftc.teamcode.RobotConstants;
  * </pre>
  */
 @Config
-public class TurretAimingSubsystem {
+public class TurretSubsystem {
     public static double TURRET_MIN = 0.08;
     public static double TURRET_MAX = 0.92;
     public static double TURRET_CENTER = 0.50;
@@ -97,7 +97,7 @@ public class TurretAimingSubsystem {
     private double headingErrorRad = 0.0;
     private double xPixelError = 0.0;
 
-    public TurretAimingSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
+    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         turretServo = getHardware(hardwareMap, Servo.class, RobotConstants.TURRET_SERVO_NAME);
         ledGreen = getHardware(hardwareMap, DigitalChannel.class, RobotConstants.LED_GREEN_NAME);

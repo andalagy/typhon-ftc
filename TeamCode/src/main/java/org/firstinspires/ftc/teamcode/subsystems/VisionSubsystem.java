@@ -86,7 +86,7 @@ public class VisionSubsystem {
         }
     }
 
-    private final OpenCvWebcam webcam;
+    private OpenCvWebcam webcam;
     private final SleevePipeline pipeline;
     private final AprilTagPipeline aprilTagPipeline;
     private final Telemetry telemetry;
@@ -139,16 +139,27 @@ public class VisionSubsystem {
         this.telemetry = telemetry;
         Resources res = hardwareMap.appContext.getResources();
         int cameraMonitorViewId = res.getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(
-                hardwareMap.get(WebcamName.class, RobotConstants.WEBCAM_NAME),
-                cameraMonitorViewId);
         pipeline = new SleevePipeline();
-        webcam.setPipeline(pipeline);
         aprilTagPipeline = new AprilTagPipeline();
+        try {
+            webcam = OpenCvCameraFactory.getInstance().createWebcam(
+                    hardwareMap.get(WebcamName.class, RobotConstants.WEBCAM_NAME),
+                    cameraMonitorViewId);
+            webcam.setPipeline(pipeline);
+        } catch (RuntimeException e) {
+            webcam = null;
+            cameraStatus = "Webcam not found: " + e.getMessage();
+            pushTelemetry(cameraStatus);
+        }
     }
 
     /** start streaming to the RC phone and begin detecting motifs */
     public void start() {
+        if (webcam == null) {
+            cameraStatus = "No webcam available";
+            pushTelemetry(cameraStatus);
+            return;
+        }
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
@@ -168,7 +179,12 @@ public class VisionSubsystem {
 
     /** stop streaming to free the camera for other OpModes */
     public void stop() {
-        webcam.stopStreaming();
+        if (webcam == null) {
+            return;
+        }
+        if (webcam.isStreaming()) {
+            webcam.stopStreaming();
+        }
         webcam.closeCameraDeviceAsync(() -> { });
     }
 

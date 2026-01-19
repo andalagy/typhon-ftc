@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.TurretAimingSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.AprilTagMeaning;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.BackdropTarget;
@@ -36,7 +36,7 @@ public class DecodeAutoRoutine {
     private final LinearOpMode opMode;
     private final DriveSubsystem drive;
     private final IntakeSubsystem intake;
-    private final TurretAimingSubsystem turret;
+    private final TurretSubsystem turret;
     private final VisionSubsystem vision;
 
     private final StartPos startPos;
@@ -61,7 +61,7 @@ public class DecodeAutoRoutine {
         this.startPos = startPos;
         drive = new DriveSubsystem(opMode.hardwareMap);
         intake = new IntakeSubsystem(opMode.hardwareMap);
-        turret = new TurretAimingSubsystem(opMode.hardwareMap, opMode.telemetry);
+        turret = new TurretSubsystem(opMode.hardwareMap, opMode.telemetry);
         vision = new VisionSubsystem(opMode.hardwareMap, opMode.telemetry);
     }
 

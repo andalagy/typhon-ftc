@@ -160,6 +160,7 @@ public class DriveSubsystem {
     }
 
     public void driveToPose(Pose2d targetPose, double maxPower, LinearOpMode opMode) {
+        com.qualcomm.robotcore.util.ElapsedTime timer = new com.qualcomm.robotcore.util.ElapsedTime();
         while (opMode.opModeIsActive()) {
             updatePoseEstimate();
             Pose2d current = getPoseEstimate();
@@ -183,10 +184,13 @@ public class DriveSubsystem {
                     -maxPower, maxPower);
 
             double denominator = Math.max(Math.abs(yCommand) + Math.abs(xCommand) + Math.abs(turn), 1.0);
-            setWheelPowers((yCommand + xCommand + turn) / denominator * maxPower,
-                    (yCommand - xCommand - turn) / denominator * maxPower,
-                    (yCommand - xCommand + turn) / denominator * maxPower,
-                    (yCommand + xCommand - turn) / denominator * maxPower);
+            setWheelPowers((yCommand + xCommand + turn) / denominator,
+                    (yCommand - xCommand - turn) / denominator,
+                    (yCommand - xCommand + turn) / denominator,
+                    (yCommand + xCommand - turn) / denominator);
+            if (timer.seconds() >= RobotConstants.TRAJECTORY_MAX_TIME_SEC) {
+                break;
+            }
             opMode.idle();
         }
         stop();
@@ -251,14 +255,16 @@ public class DriveSubsystem {
         int targetTicks = ticksFromInches(Math.abs(inches));
         double direction = Math.signum(inches);
         while (opMode.opModeIsActive() && Math.abs(getAverageEncoderPosition()) < targetTicks) {
-            double headingError = Math.toRadians(holdHeadingDeg) - getHeadingRadians();
+            double headingError = AngleUtil.normalizeRadians(Math.toRadians(holdHeadingDeg) - getHeadingRadians());
             double correction = Range.clip(headingError * RobotConstants.HEADING_HOLD_KP,
                     -RobotConstants.HEADING_HOLD_MAX_TURN, RobotConstants.HEADING_HOLD_MAX_TURN);
 
-            setWheelPowers((direction * speed) + correction,
-                    (direction * speed) - correction,
-                    (direction * speed) + correction,
-                    (direction * speed) - correction);
+            double leftPower = (direction * speed) + correction;
+            double rightPower = (direction * speed) - correction;
+            setWheelPowers(Range.clip(leftPower, -1.0, 1.0),
+                    Range.clip(rightPower, -1.0, 1.0),
+                    Range.clip(leftPower, -1.0, 1.0),
+                    Range.clip(rightPower, -1.0, 1.0));
             opMode.idle();
         }
         stop();
@@ -270,15 +276,15 @@ public class DriveSubsystem {
         int targetTicks = ticksFromInches(Math.abs(inches));
         double direction = Math.signum(inches); // right is positive
         while (opMode.opModeIsActive() && Math.abs(getAverageEncoderPosition()) < targetTicks) {
-            double headingError = Math.toRadians(holdHeadingDeg) - getHeadingRadians();
+            double headingError = AngleUtil.normalizeRadians(Math.toRadians(holdHeadingDeg) - getHeadingRadians());
             double correction = Range.clip(headingError * RobotConstants.HEADING_HOLD_KP,
                     -RobotConstants.HEADING_HOLD_MAX_TURN, RobotConstants.HEADING_HOLD_MAX_TURN);
 
             double base = direction * speed;
-            setWheelPowers(base + correction,
-                    -base - correction,
-                    -base + correction,
-                    base - correction);
+            setWheelPowers(Range.clip(base + correction, -1.0, 1.0),
+                    Range.clip(-base - correction, -1.0, 1.0),
+                    Range.clip(-base + correction, -1.0, 1.0),
+                    Range.clip(base - correction, -1.0, 1.0));
             opMode.idle();
         }
         stop();
@@ -288,7 +294,7 @@ public class DriveSubsystem {
     public void turnToHeading(double targetHeadingDeg, double maxPower, LinearOpMode opMode) {
         double targetRad = Math.toRadians(targetHeadingDeg);
         while (opMode.opModeIsActive()) {
-            double error = targetRad - getHeadingRadians();
+            double error = AngleUtil.normalizeRadians(targetRad - getHeadingRadians());
             if (Math.abs(error) < Math.toRadians(1.5)) {
                 break;
             }
