@@ -291,6 +291,13 @@ public class VisionSubsystem {
             Rect centerRoi = clampRect(new Rect(CENTER_X, ROI_Y, ROI_WIDTH, ROI_HEIGHT), hsv);
             Rect rightRoi = clampRect(new Rect(RIGHT_X, ROI_Y, ROI_WIDTH, ROI_HEIGHT), hsv);
 
+            if (leftRoi.width <= 0 || leftRoi.height <= 0
+                    || centerRoi.width <= 0 || centerRoi.height <= 0
+                    || rightRoi.width <= 0 || rightRoi.height <= 0) {
+                hsv.release();
+                return input;
+            }
+
             double leftScore = computeScore(hsv.submat(leftRoi));
             double centerScore = computeScore(hsv.submat(centerRoi));
             double rightScore = computeScore(hsv.submat(rightRoi));

@@ -254,7 +254,10 @@ public class DriveSubsystem {
         resetDriveEncoders();
         int targetTicks = ticksFromInches(Math.abs(inches));
         double direction = Math.signum(inches);
-        while (opMode.opModeIsActive() && Math.abs(getAverageEncoderPosition()) < targetTicks) {
+        com.qualcomm.robotcore.util.ElapsedTime timer = new com.qualcomm.robotcore.util.ElapsedTime();
+        while (opMode.opModeIsActive()
+                && Math.abs(getAverageEncoderPosition()) < targetTicks
+                && timer.seconds() < RobotConstants.DRIVE_STRAIGHT_TIMEOUT_SEC) {
             double headingError = AngleUtil.normalizeRadians(Math.toRadians(holdHeadingDeg) - getHeadingRadians());
             double correction = Range.clip(headingError * RobotConstants.HEADING_HOLD_KP,
                     -RobotConstants.HEADING_HOLD_MAX_TURN, RobotConstants.HEADING_HOLD_MAX_TURN);
@@ -275,7 +278,10 @@ public class DriveSubsystem {
         resetDriveEncoders();
         int targetTicks = ticksFromInches(Math.abs(inches));
         double direction = Math.signum(inches); // right is positive
-        while (opMode.opModeIsActive() && Math.abs(getAverageEncoderPosition()) < targetTicks) {
+        com.qualcomm.robotcore.util.ElapsedTime timer = new com.qualcomm.robotcore.util.ElapsedTime();
+        while (opMode.opModeIsActive()
+                && Math.abs(getAverageEncoderPosition()) < targetTicks
+                && timer.seconds() < RobotConstants.STRAFE_TIMEOUT_SEC) {
             double headingError = AngleUtil.normalizeRadians(Math.toRadians(holdHeadingDeg) - getHeadingRadians());
             double correction = Range.clip(headingError * RobotConstants.HEADING_HOLD_KP,
                     -RobotConstants.HEADING_HOLD_MAX_TURN, RobotConstants.HEADING_HOLD_MAX_TURN);
@@ -293,7 +299,8 @@ public class DriveSubsystem {
     /** IMU-only turn helper with simple proportional control */
     public void turnToHeading(double targetHeadingDeg, double maxPower, LinearOpMode opMode) {
         double targetRad = Math.toRadians(targetHeadingDeg);
-        while (opMode.opModeIsActive()) {
+        com.qualcomm.robotcore.util.ElapsedTime timer = new com.qualcomm.robotcore.util.ElapsedTime();
+        while (opMode.opModeIsActive() && timer.seconds() < RobotConstants.TURN_TIMEOUT_SEC) {
             double error = AngleUtil.normalizeRadians(targetRad - getHeadingRadians());
             if (Math.abs(error) < Math.toRadians(1.5)) {
                 break;
