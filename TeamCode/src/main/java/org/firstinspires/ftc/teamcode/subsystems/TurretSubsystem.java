@@ -56,6 +56,7 @@ public class TurretAimingSubsystem {
 
     public static double kHeadingAim = 0.07; // servo units per radian
     public static double kPixelAim = 0.0015; // servo units per pixel
+    public static double MAX_TURRET_STEP_PER_UPDATE = 0.02; // servo units
     public static double HEADING_DEADBAND_RAD = Math.toRadians(1.0);
     public static double PIXEL_DEADBAND = 4.0;
     public static double HEADING_READY_TOLERANCE_RAD = Math.toRadians(2.0);
@@ -133,10 +134,14 @@ public class TurretAimingSubsystem {
             boolean headingValid = Double.isFinite(headingErrorRad);
             if (headingValid && Math.abs(headingErrorRad) > HEADING_DEADBAND_RAD) {
                 aimError = headingErrorRad;
-                turretPos += headingErrorRad * kHeadingAim;
+                double delta = headingErrorRad * kHeadingAim;
+                delta = Range.clip(delta, -MAX_TURRET_STEP_PER_UPDATE, MAX_TURRET_STEP_PER_UPDATE);
+                turretPos += delta;
             } else if (Math.abs(xPixelError) > PIXEL_DEADBAND) {
                 aimError = xPixelError;
-                turretPos += xPixelError * kPixelAim;
+                double delta = xPixelError * kPixelAim;
+                delta = Range.clip(delta, -MAX_TURRET_STEP_PER_UPDATE, MAX_TURRET_STEP_PER_UPDATE);
+                turretPos += delta;
             } else {
                 aimError = 0.0;
             }
