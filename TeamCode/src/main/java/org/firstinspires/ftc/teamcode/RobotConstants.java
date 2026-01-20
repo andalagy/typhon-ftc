@@ -21,9 +21,14 @@ public class RobotConstants {
 
     public static final String IMU_NAME          = "imu";
     public static final String WEBCAM_NAME       = "Webcam 1";
+    public static final String LIMELIGHT_NAME    = "limelight";
 
     public static final String LED_GREEN_NAME    = "ledGreen";
     public static final String LED_RED_NAME      = "ledRed";
+
+    // Limelight pipeline indices
+    public static final int LIMELIGHT_PIPELINE_MOTIF = 0;
+    public static final int LIMELIGHT_PIPELINE_APRILTAG = 1;
 
     // ----------------------------------------------------------------
     // Driving Speed Multipliers
