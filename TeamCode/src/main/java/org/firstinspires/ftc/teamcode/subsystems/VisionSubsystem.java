@@ -287,9 +287,21 @@ public class VisionSubsystem {
             }
         }
 
-        double xPixelError = result.getTx();
+        double xDegrees = chosen.getTargetXDegrees();
+        if (!Double.isFinite(xDegrees)) {
+            xDegrees = result.getTx();
+        }
+        double xPixelError = degreesToPixels(xDegrees);
         return new BackdropTarget(chosen.getFiducialId(), rangeMeters, lateralMeters,
                 headingErrorRad, xPixelError);
+    }
+
+    private static double degreesToPixels(double xDegrees) {
+        if (!Double.isFinite(xDegrees)) {
+            return 0.0;
+        }
+        return xDegrees * (RobotConstants.LIMELIGHT_IMAGE_WIDTH_PX
+                / RobotConstants.LIMELIGHT_HORIZONTAL_FOV_DEG);
     }
 
     private static double estimateRangeMeters(FiducialResult fiducial) {

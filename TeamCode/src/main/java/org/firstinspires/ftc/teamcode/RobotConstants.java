@@ -29,6 +29,9 @@ public class RobotConstants {
     // Limelight pipeline indices
     public static final int LIMELIGHT_PIPELINE_MOTIF = 0;
     public static final int LIMELIGHT_PIPELINE_APRILTAG = 1;
+    // Limelight image geometry (tune to match your pipeline resolution).
+    public static final double LIMELIGHT_IMAGE_WIDTH_PX = 640.0;
+    public static final double LIMELIGHT_HORIZONTAL_FOV_DEG = 63.3;
 
     // ----------------------------------------------------------------
     // Driving Speed Multipliers
