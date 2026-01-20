@@ -20,7 +20,6 @@ public class RobotConstants {
     public static final String TURRET_SERVO_NAME = "turretServo";
 
     public static final String IMU_NAME          = "imu";
-    public static final String WEBCAM_NAME       = "Webcam 1";
     public static final String LIMELIGHT_NAME    = "limelight";
 
     public static final String LED_GREEN_NAME    = "ledGreen";
