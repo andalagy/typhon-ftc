@@ -26,6 +26,7 @@ public class HoodSubsystem {
         hoodMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         hoodMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         hoodMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        stop();
     }
 
     public void hoodUp() {
