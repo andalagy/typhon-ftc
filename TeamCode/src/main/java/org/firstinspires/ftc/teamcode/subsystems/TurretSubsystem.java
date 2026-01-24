@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import org.firstinspires.ftc.teamcode.RobotConstants;
 
@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.RobotConstants;
  * vision.start();
  * vision.useAprilTags();
  *
- * TurretSubsystem turret = new TurretSubsystem(hardwareMap, telemetry);
+ * TurretSubsystem turret = new TurretSubsystem(hardwareMap);
  *
  * while (opModeIsActive()) {
  *     if (gamepad1.left_bumper) {
@@ -76,7 +76,6 @@ public class TurretSubsystem {
     private final DigitalChannel ledRed;
     private final DcMotorEx shooterMotor;
     private final Servo feederServo;
-    private final Telemetry telemetry;
     private final ElapsedTime fireTimer = new ElapsedTime();
 
     private double turretPos = TURRET_CENTER;
@@ -95,8 +94,7 @@ public class TurretSubsystem {
     private double headingErrorRad = 0.0;
     private double xPixelError = 0.0;
 
-    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.telemetry = telemetry;
+    public TurretSubsystem(HardwareMap hardwareMap) {
         turretServo = getHardware(hardwareMap, Servo.class, RobotConstants.TURRET_SERVO_NAME);
         ledGreen = getHardware(hardwareMap, DigitalChannel.class, RobotConstants.LED_GREEN_NAME);
         ledRed = getHardware(hardwareMap, DigitalChannel.class, RobotConstants.LED_RED_NAME);

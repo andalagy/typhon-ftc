@@ -30,7 +30,7 @@ public class DecodeTeleOp extends LinearOpMode {
         drive = new DriveSubsystem(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
         vision = new VisionSubsystem(hardwareMap, telemetry);
-        turret = new TurretSubsystem(hardwareMap, telemetry);
+        turret = new TurretSubsystem(hardwareMap);
 
         vision.start();
         vision.useAprilTags();
