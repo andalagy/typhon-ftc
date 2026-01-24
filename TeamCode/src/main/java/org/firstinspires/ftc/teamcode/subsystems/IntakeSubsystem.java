@@ -23,7 +23,9 @@ public class IntakeSubsystem {
         feedMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         storageMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        feedMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        feedMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        stop();
     }
 
     public void intakeIn() {
