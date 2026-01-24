@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -48,7 +47,6 @@ import org.firstinspires.ftc.teamcode.RobotConstants;
  * }
  * </pre>
  */
-@Config
 public class TurretSubsystem {
     public static double TURRET_MIN = 0.08;
     public static double TURRET_MAX = 0.92;
