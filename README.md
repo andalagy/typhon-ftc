@@ -29,4 +29,4 @@ Fully functioning base code, tested, ready to plug in on the finished bot.  (min
 <br>
 <br>
 <br>
-lowkey im carrying here :Y
+    i actually kinda hate you alex :_((
