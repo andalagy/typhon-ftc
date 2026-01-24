@@ -1,18 +1,16 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes.ColorResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes.FiducialResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.external.Telemetry;
-import com.qualcomm.robotcore.external.matrices.VectorF;
-import com.qualcomm.robotcore.external.navigation.AngleUnit;
-import com.qualcomm.robotcore.external.navigation.Orientation;
-import com.qualcomm.robotcore.external.navigation.Pose3D;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.RobotConstants;
 
 import java.util.Comparator;
@@ -28,7 +26,6 @@ import java.util.List;
  * For motif detection, the preferred flow is a Python SnapScript that writes the motif index to
  * pythonOutput[0]: 0 -> MOTIF_A, 1 -> MOTIF_B, 2 -> MOTIF_C.
  */
-@Config
 public class VisionSubsystem {
 
     public enum DetectedMotif {
@@ -371,11 +368,6 @@ public class VisionSubsystem {
         if (telemetry != null) {
             telemetry.addLine(message);
             telemetry.update();
-        }
-        FtcDashboard dashboard = FtcDashboard.getInstance();
-        if (dashboard != null) {
-            dashboard.getTelemetry().addLine(message);
-            dashboard.getTelemetry().update();
         }
     }
 
