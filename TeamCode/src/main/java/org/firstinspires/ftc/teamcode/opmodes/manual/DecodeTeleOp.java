@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.HoodSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.DetectedMotif;
 
@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.DetectedMotif;
 public class DecodeTeleOp extends LinearOpMode {
     private DriveSubsystem drive;
     private IntakeSubsystem intake;
-    private TurretSubsystem turret;
+    private HoodSubsystem hood;
     private VisionSubsystem vision;
 
     private boolean headingHoldToggleLatch = false;
@@ -29,8 +29,8 @@ public class DecodeTeleOp extends LinearOpMode {
         // Build each subsystem so we reuse the same hardware mapping everywhere
         drive = new DriveSubsystem(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
+        hood = new HoodSubsystem(hardwareMap);
         vision = new VisionSubsystem(hardwareMap, telemetry);
-        turret = new TurretSubsystem(hardwareMap);
 
         vision.start();
         vision.useAprilTags();
@@ -52,8 +52,8 @@ public class DecodeTeleOp extends LinearOpMode {
             double y = -gamepad1.left_stick_y; // forward on the stick is negative in FTC, so flip it
             double x = gamepad1.left_stick_x;
             double rotation = gamepad1.right_stick_x;
-            boolean slowMode = gamepad1.right_bumper; // hold for gentle mode when lining up
-            if (gamepad1.left_bumper) {
+            boolean slowMode = gamepad1.right_stick_button; // hold for gentle mode when lining up
+            if (gamepad1.y) {
                 drive.resetHeading(); // quick re-zero if field-centric starts to feel off
             }
             boolean headingHoldButton = gamepad1.x;
@@ -64,24 +64,36 @@ public class DecodeTeleOp extends LinearOpMode {
 
             drive.drive(x, y, rotation, slowMode);
 
-            // Intake control: right trigger sucks game pieces in, left trigger spits them back out
-            if (gamepad2.right_trigger > 0.1) {
-                intake.intakeIn();
-            } else if (gamepad2.left_trigger > 0.1) {
-                intake.intakeOut();
+            // Storage intake: left bumper pulls in, left trigger reverses
+            if (gamepad1.left_bumper) {
+                intake.storageIn();
+            } else if (gamepad1.left_trigger > 0.2) {
+                intake.storageOut();
             } else {
-                intake.stop();
+                intake.stopStorage();
+            }
+
+            // Feed intake: right bumper pulls in, right trigger reverses
+            if (gamepad1.right_bumper) {
+                intake.feedIn();
+            } else if (gamepad1.right_trigger > 0.2) {
+                intake.feedOut();
+            } else {
+                intake.stopFeed();
+            }
+
+            // Hood control: D-pad up/down to adjust angle, no input stops the motor
+            if (gamepad2.dpad_up) {
+                hood.hoodUp();
+            } else if (gamepad2.dpad_down) {
+                hood.hoodDown();
+            } else {
+                hood.stop();
             }
 
             // Vision heartbeat: report live motif
             DetectedMotif detectedMotif = vision.getCurrentMotif();
             VisionSubsystem.BackdropTarget target = vision.getBackdropTarget(detectedMotif);
-            if (target != null) {
-                turret.setVisionAim(target.headingErrorRad, target.xPixelError, true);
-            } else {
-                turret.setVisionAim(0.0, 0.0, false);
-            }
-            turret.update();
             vision.applyCameraControls();
 
             telemetry.addData("Heading (deg)", "%.1f", drive.getHeadingDegrees());
@@ -90,18 +102,20 @@ public class DecodeTeleOp extends LinearOpMode {
             telemetry.addData("Drive powers", "FL %.2f FR %.2f BL %.2f BR %.2f",
                     drive.getFrontLeftPower(), drive.getFrontRightPower(),
                     drive.getBackLeftPower(), drive.getBackRightPower());
-            telemetry.addData("Intake power", "%.2f", intake.getPower());
+            telemetry.addData("Storage intake", "%.2f", intake.getStoragePower());
+            telemetry.addData("Feed intake", "%.2f", intake.getFeedPower());
+            telemetry.addData("Hood power", "%.2f", hood.getPower());
+            telemetry.addData("Hood ticks", hood.getPositionTicks());
             telemetry.addData("Vision motif", detectedMotif);
             telemetry.addData("Vision camera", vision.getCameraStatus());
             telemetry.addData("Tag visible", target != null);
-            telemetry.addData("Turret aligned", turret.isAligned());
-            telemetry.addData("Turret aim error", "%.3f", turret.getAimError());
             telemetry.update();
         }
 
         // make sure everything is stopped once the driver hits stop
         drive.stop();
         intake.stop();
+        hood.stop();
         vision.stop();
     }
 

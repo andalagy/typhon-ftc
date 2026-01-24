@@ -14,16 +14,26 @@ public class RobotConstants {
     public static final String BACK_LEFT_NAME   = "backLeft";
     public static final String BACK_RIGHT_NAME  = "backRight";
 
-    public static final String INTAKE_NAME       = "intakeMotor";
-    public static final String SHOOTER_MOTOR_NAME= "shooterMotor";
-    public static final String FEEDER_SERVO_NAME = "feederServo";
-    public static final String TURRET_SERVO_NAME = "turretServo";
+    public static final String INTAKE_STORAGE_NAME = "intakeStorage";
+    public static final String INTAKE_FEED_NAME    = "intakeFeed";
+    public static final String HOOD_MOTOR_NAME     = "hoodMotor";
+    public static final String SHOOTER_MOTOR_NAME  = "shooterMotor";
+    public static final String FEEDER_SERVO_NAME   = "feederServo";
+    public static final String TURRET_SERVO_NAME   = "turretServo";
 
     public static final String IMU_NAME          = "imu";
     public static final String LIMELIGHT_NAME    = "limelight";
 
     public static final String LED_GREEN_NAME    = "ledGreen";
     public static final String LED_RED_NAME      = "ledRed";
+
+    // ----------------------------------------------------------------
+    // Hood Limits (encoder ticks) and power (tune for your mechanism)
+    // ----------------------------------------------------------------
+    public static final int HOOD_MIN_TICKS = 0;
+    public static final int HOOD_MAX_TICKS = 1200;
+    public static final double HOOD_POWER = 0.6;
+    public static final double HOOD_MAX_RUN_SEC = 1.0;
 
     // Limelight pipeline indices
     public static final int LIMELIGHT_PIPELINE_MOTIF = 0;
