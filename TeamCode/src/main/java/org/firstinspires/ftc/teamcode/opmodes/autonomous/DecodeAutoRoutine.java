@@ -61,7 +61,7 @@ public class DecodeAutoRoutine {
         this.startPos = startPos;
         drive = new DriveSubsystem(opMode.hardwareMap);
         intake = new IntakeSubsystem(opMode.hardwareMap);
-        turret = new TurretSubsystem(opMode.hardwareMap, opMode.telemetry);
+        turret = new TurretSubsystem(opMode.hardwareMap);
         vision = new VisionSubsystem(opMode.hardwareMap, opMode.telemetry);
     }
 
