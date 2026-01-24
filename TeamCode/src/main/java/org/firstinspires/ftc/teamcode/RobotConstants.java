@@ -17,15 +17,9 @@ public class RobotConstants {
     public static final String INTAKE_STORAGE_NAME = "intakeStorage";
     public static final String INTAKE_FEED_NAME    = "intakeFeed";
     public static final String HOOD_MOTOR_NAME     = "hoodMotor";
-    public static final String SHOOTER_MOTOR_NAME  = "shooterMotor";
-    public static final String FEEDER_SERVO_NAME   = "feederServo";
-    public static final String TURRET_SERVO_NAME   = "turretServo";
 
     public static final String IMU_NAME          = "imu";
     public static final String LIMELIGHT_NAME    = "limelight";
-
-    public static final String LED_GREEN_NAME    = "ledGreen";
-    public static final String LED_RED_NAME      = "ledRed";
 
     // ----------------------------------------------------------------
     // Hood Limits (encoder ticks) and power (tune for your mechanism)
