@@ -6,14 +6,13 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.AprilTagMeaning;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem.BackdropTarget;
 
 /**
  * Non-blocking autonomous state machine for the DECODE game.
- * Uses the existing Drive/Intake/Turret/Vision subsystems and a timer-based flow.
+ * Uses the existing Drive/Intake/Vision subsystems and a timer-based flow.
  */
 public class DecodeAutoRoutine {
     private static final double TARGET_RANGE_INCHES = 22.0; // TODO: tune
@@ -36,14 +35,12 @@ public class DecodeAutoRoutine {
     private final LinearOpMode opMode;
     private final DriveSubsystem drive;
     private final IntakeSubsystem intake;
-    private final TurretSubsystem turret;
     private final VisionSubsystem vision;
 
     private final StartPos startPos;
 
     private final ElapsedTime stateTimer = new ElapsedTime();
     private AutoState state = AutoState.IDLE;
-    private boolean fireRequested = false;
 
     private enum AutoState {
         IDLE,
@@ -61,7 +58,6 @@ public class DecodeAutoRoutine {
         this.startPos = startPos;
         drive = new DriveSubsystem(opMode.hardwareMap);
         intake = new IntakeSubsystem(opMode.hardwareMap);
-        turret = new TurretSubsystem(opMode.hardwareMap);
         vision = new VisionSubsystem(opMode.hardwareMap, opMode.telemetry);
     }
 
@@ -95,20 +91,11 @@ public class DecodeAutoRoutine {
     public void start() {
         state = AutoState.SPIN_UP;
         stateTimer.reset();
-        fireRequested = false;
-        turret.spinUp();
     }
 
     public void update() {
         BackdropTarget target = vision.getBackdropTarget(vision.getCurrentMotif());
         boolean hasTarget = target != null;
-
-        if (hasTarget) {
-            turret.setVisionAim(target.headingErrorRad, target.xPixelError, true);
-        } else {
-            turret.setVisionAim(0.0, 0.0, false);
-        }
-        turret.update();
 
         switch (state) {
             case SPIN_UP:
@@ -159,10 +146,6 @@ public class DecodeAutoRoutine {
                 break;
             case SCORE:
                 drive.stop();
-                if (!fireRequested && hasTarget && turret.isReady()) {
-                    turret.requestFire();
-                    fireRequested = true;
-                }
                 if (stateTimer.seconds() >= SCORE_TIME_SEC) {
                     transitionTo(AutoState.PARK);
                 }
@@ -173,7 +156,6 @@ public class DecodeAutoRoutine {
                     drive.drive(parkDrive.strafe, parkDrive.forward, 0.0, false);
                 } else {
                     drive.stop();
-                    turret.stopShooter();
                     transitionTo(AutoState.DONE);
                 }
                 break;
@@ -181,7 +163,6 @@ public class DecodeAutoRoutine {
             default:
                 drive.stop();
                 intake.stop();
-                turret.stopShooter();
                 break;
         }
 
@@ -198,14 +179,12 @@ public class DecodeAutoRoutine {
         } else {
             opMode.telemetry.addLine("Tag Pose: not visible");
         }
-        turret.telemetry(opMode.telemetry);
         opMode.telemetry.update();
     }
 
     public void stop() {
         drive.stop();
         intake.stop();
-        turret.stopShooter();
         vision.stop();
     }
 
