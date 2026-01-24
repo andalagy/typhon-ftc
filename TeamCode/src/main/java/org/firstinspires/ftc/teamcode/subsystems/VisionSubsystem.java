@@ -9,8 +9,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.RobotConstants;
 
 import java.util.Comparator;
@@ -208,7 +209,7 @@ public class VisionSubsystem {
         if (result == null) {
             return 0.0;
         }
-        return result.getArea();
+        return result.getTargetArea();
     }
 
     private static DetectedMotif motifFromIndex(double index) {
@@ -271,16 +272,17 @@ public class VisionSubsystem {
         double headingErrorRad = 0.0;
 
         if (pose != null) {
-            VectorF translation = pose.getPosition();
+            Position position = pose.getPosition();
+            VectorF translation = position == null
+                    ? null
+                    : new VectorF((float) position.x, (float) position.y, (float) position.z);
             if (translation != null && translation.length() >= 3) {
                 lateralMeters = translation.get(1);
                 rangeMeters = translation.get(2);
             }
-            Orientation orientation = pose.getOrientation();
+            YawPitchRollAngles orientation = pose.getOrientation();
             if (orientation != null) {
-                headingErrorRad = orientation.angleUnit == AngleUnit.RADIANS
-                        ? orientation.thirdAngle
-                        : Math.toRadians(orientation.thirdAngle);
+                headingErrorRad = orientation.getYaw(AngleUnit.RADIANS);
             }
         }
 
@@ -309,7 +311,10 @@ public class VisionSubsystem {
         if (pose == null) {
             return Double.POSITIVE_INFINITY;
         }
-        VectorF translation = pose.getPosition();
+        Position position = pose.getPosition();
+        VectorF translation = position == null
+                ? null
+                : new VectorF((float) position.x, (float) position.y, (float) position.z);
         if (translation == null || translation.length() < 3) {
             return Double.POSITIVE_INFINITY;
         }
