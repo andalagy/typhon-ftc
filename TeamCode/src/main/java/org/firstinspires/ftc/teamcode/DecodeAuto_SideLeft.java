@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.opmodes.autonomous;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "Decode Auto Center Right", group = "Decode")
-public class DecodeAuto_CenterRight extends LinearOpMode {
+@Autonomous(name = "Decode Auto Side Left", group = "Decode")
+public class DecodeAuto_SideLeft extends LinearOpMode {
     @Override
     public void runOpMode() {
-        DecodeAutoRoutine routine = new DecodeAutoRoutine(this, StartPos.CENTER_RIGHT);
+        DecodeAutoRoutine routine = new DecodeAutoRoutine(this, StartPos.SIDE_LEFT);
         routine.init();
 
         while (!isStarted() && !isStopRequested()) {
